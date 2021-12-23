@@ -1,5 +1,11 @@
 import React, { useContext, createContext } from 'react';
 import * as Google from 'expo-google-app-auth';
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+  signOut,
+} from '@firebase/auth';
 
 const AuthContext = createContext({});
 
@@ -16,12 +22,15 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     Google.logInAsync(config).then(async (logInResult) => {
       if (logInResult.type === 'success') {
-        //login
+        const { idToken, accessToken } = logInResult;
+        const credential = GoogleAuthProvider.credential(idToken, accessToken);
       }
+
+      await signInWithCredential(credential);
     });
   };
   return (
-    <AuthContext.Provider value={{ user: null }}>
+    <AuthContext.Provider value={{ user: null, signInWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
